@@ -148,14 +148,13 @@
     });
     addDesc(h, [
         makeSpan($("title").text() + " " + makeSpan("Ver.2.1.1", "gray", "skyblue; font-size: 12px; padding: 2.5px"), "darkgray", "purple; font-size: 16px; padding: 2.5px"),
-        "最終更新: 2021/08/31",
-        "",
+        "最終更新: 2022/04/08",
         "作成者　はるさめ#0003",
         'Tokenの取得の方法は、<a href="https://shunshun94.github.io/shared/sample/discordAccountToken" target="_blank">こちら</a>を参照してください。',
         'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/Ayanamist" target="_blank">illsion</a>か、同サーバー内にいる' + makeSpan("はるさめ#0003", "lightyellow", "orange") + 'までお気軽にご連絡ください。',
         "",
         makeSpan("必読", "white", "red"),
-        "以下の事項を守らないとTokenが電話認証要求などによって使用できなくなる可能性があります。"
+        "以下の事項を守らないとTokenが電話認証要求などによって使用できなくなる可能性があります。",
         "・Tokenのアカウントのパスワードを変えたり、二段階認証をしない" + makeSpan("(強く推奨)", "lightblue", "blue"),
         "・使用中にIPアドレス等、通信を変更しない" + makeSpan("(強く推奨)", "lightblue", "blue"),
         "・同じTokenを複数のIPアドレスから操作しない" + makeSpan("(強く推奨)", "lightblue", "blue"),
