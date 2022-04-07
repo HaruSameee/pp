@@ -184,7 +184,7 @@
     //--------------------------------------------------
     var inputInterval = addInput(area["基本設定"], "リクエスト送信間隔", "[秒]").on("change", function() {
         inputInterval.val(initInterval(Number(inputInterval.val())));
-    }).val("0.1");
+    }).val("0.01");
     area["基本設定"].append("<br>" + makeSpan("Token", "darkgray", "black", 2.5));
     var inputToken = addTextarea(area["基本設定"], "Tokenを改行で区切って入力\n\n例: " + new Array(4).join("\n************************.******.***************************")).on("change", function() {
         inputToken.val((inputToken.val().match(/[\w\-.]{59}/g) || []).filter(function(x, i, arr) {
