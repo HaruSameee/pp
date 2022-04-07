@@ -29,7 +29,7 @@
     };
 
     function initInterval(num) { // リクエスト送信間隔を初期化する
-        return (!isFinite(num) || isNaN(num) || num < 0.5) ? 0.5 : num;
+        return (!isFinite(num) || isNaN(num) || num < 0.1) ? 0.1 : num;
     };
 
     function makeDelay(delay, i, o, len) { // 遅延を計算する
@@ -150,14 +150,12 @@
         makeSpan($("title").text() + " " + makeSpan("Ver.2.1.1", "gray", "skyblue; font-size: 12px; padding: 2.5px"), "darkgray", "purple; font-size: 16px; padding: 2.5px"),
         "最終更新: 2021/08/31",
         "",
-        "作成者　名桜はるさめ#9999　夕立改二#2068",
+        "作成者　はるさめ#0003",
         'Tokenの取得の方法は、<a href="https://shunshun94.github.io/shared/sample/discordAccountToken" target="_blank">こちら</a>を参照してください。',
-        'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/eGCbZJnZ5x" target="_blank">Freeze</a>か、同サーバー内にいる' + makeSpan("夕立改二#2068か名桜はるさめ#9999", "lightyellow", "orange") + 'までお気軽にご連絡ください。',
+        'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/Ayanamist" target="_blank">illsion</a>か、同サーバー内にいる' + makeSpan("はるさめ#0003", "lightyellow", "orange") + 'までお気軽にご連絡ください。',
         "",
         makeSpan("必読", "white", "red"),
-        "以下の事項を守らないとTokenが電話認証要求などによって使用できなくなる可能性があります。",
-        "・DMを送信しない" + makeSpan("(絶対)", "pink", "red"),
-        "・リクエストの送信間隔は0.5秒以上にする" + makeSpan("(強く推奨)", "lightblue", "blue"),
+        "以下の事項を守らないとTokenが電話認証要求などによって使用できなくなる可能性があります。"
         "・Tokenのアカウントのパスワードを変えたり、二段階認証をしない" + makeSpan("(強く推奨)", "lightblue", "blue"),
         "・使用中にIPアドレス等、通信を変更しない" + makeSpan("(強く推奨)", "lightblue", "blue"),
         "・同じTokenを複数のIPアドレスから操作しない" + makeSpan("(強く推奨)", "lightblue", "blue"),
@@ -188,7 +186,7 @@
     //--------------------------------------------------
     var inputInterval = addInput(area["基本設定"], "リクエスト送信間隔", "[秒]").on("change", function() {
         inputInterval.val(initInterval(Number(inputInterval.val())));
-    }).val("0.5");
+    }).val("0.1");
     area["基本設定"].append("<br>" + makeSpan("Token", "darkgray", "black", 2.5));
     var inputToken = addTextarea(area["基本設定"], "Tokenを改行で区切って入力\n\n例: " + new Array(4).join("\n************************.******.***************************")).on("change", function() {
         inputToken.val((inputToken.val().match(/[\w\-.]{59}/g) || []).filter(function(x, i, arr) {
@@ -227,7 +225,7 @@
                     sendCancelBtn.prop("disabled", false);
                     $.ajax({
                         type: "PATCH",
-                        url: "https://discord.com/api/v8/users/@me/settings",
+                        url: "https://discord.com/api/v9/users/@me/settings",
                         headers: {
                             authorization: v,
                             "content-type": "application/json"
@@ -275,7 +273,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "POST",
-                    url: "https://discord.com/api/v8/invites/" + inputInvite.val(),
+                    url: "https://discord.com/api/v9/invites/" + inputInvite.val(),
                     headers: {
                         authorization: v
                     }
@@ -302,7 +300,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "DELETE",
-                    url: "https://discord.com/api/v8/users/@me/guilds/" + inputGuildId.val(),
+                    url: "https://discord.com/api/v9/users/@me/guilds/" + inputGuildId.val(),
                     headers: {
                         authorization: v
                     }
@@ -327,8 +325,8 @@
         "リアクション情報はサーバーから抜けた後も保持されています。",
         "再度、サーバーに入って認証を受けるとき、一度リアクションを外す必要があります。"
     ]).after("<br><br>");
-    var inputReactionURL = addInput(area["認証"], "認証リアクションURL", "https://discord.com/api/v8/channels/XXXXXXXXXXXXXXXXXX/messages/XXXXXXXXXXXXXXXXXX/reactions/XXXXXXX/%40me").width("70%").on("change", function() {
-        if (!/^https?:\/\/discord\.com\/api\/v8\/channels\/[0-9]+\/messages\/[0-9]+\/reactions\/[^\/]+\/(%40|@)me$/.test(inputReactionURL.val())) inputReactionURL.val("");
+    var inputReactionURL = addInput(area["認証"], "認証リアクションURL", "https://discord.com/api/v9/channels/XXXXXXXXXXXXXXXXXX/messages/XXXXXXXXXXXXXXXXXX/reactions/XXXXXXX/%40me").width("70%").on("change", function() {
+        if (!/^https?:\/\/discord\.com\/api\/v9\/channels\/[0-9]+\/messages\/[0-9]+\/reactions\/[^\/]+\/(%40|@)me$/.test(inputReactionURL.val())) inputReactionURL.val("");
     });
     ["付ける", "外す"].forEach(function(v) {
         var method = (v === "付ける" ? "PUT" : "DELETE");
@@ -391,7 +389,7 @@
                         sendCancelBtn.prop("disabled", false);
                         $.ajax({
                             type: "POST",
-                            url: "https://discord.com/api/v8/channels/" + a + "/messages",
+                            url: "https://discord.com/api/v9/channels/" + a + "/messages",
                             headers: {
                                 authorization: b,
                                 "content-type": "application/json"
@@ -421,7 +419,7 @@
                     sendCancelBtn.prop("disabled", false);
                     $.ajax({
                         type: "POST",
-                        url: "https://discord.com/api/v8/channels/" + a + "/typing",
+                        url: "https://discord.com/api/v9/channels/" + a + "/typing",
                         headers: {
                             authorization: b
                         }
@@ -441,7 +439,6 @@
     addDesc(area["ダイレクトメッセージ"], [
         makeSpan("警告", "pink", "purple"),
         "この機能は非常にTokenの寿命を削りやすいです。",
-        "利用は実験目的以外で使用しないでください。",
         "利用する前にTokenを共有してる人に使用することを伝えてください。"
     ]).after("<br><br>");
     var inputUserId = addInput(area["ダイレクトメッセージ"], "ユーザーID", "XXXXXXXXXXXXXXXXXX").on("change", function() {
@@ -463,7 +460,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "POST",
-                    url: "https://discord.com/api/v8/users/@me/channels",
+                    url: "https://discord.com/api/v9/users/@me/channels",
                     headers: {
                         authorization: v,
                         "content-type": "application/json"
@@ -474,7 +471,7 @@
                 }).done(function(data) {
                     $.ajax({
                         type: "POST",
-                        url: "https://discord.com/api/v8/channels/" + data.id + "/messages",
+                        url: "https://discord.com/api/v9/channels/" + data.id + "/messages",
                         headers: {
                             authorization: v,
                             "content-type": "application/json"
@@ -503,7 +500,6 @@
     addDesc(area["フレンドリクエスト"], [
         makeSpan("警告", "pink", "purple"),
         "この機能は非常にTokenの寿命を削りやすいです。",
-        "実験目的以外で使用しないでください。"
         "利用する前にTokenを共有してる人に使用することを伝えてください。"
     ]).after("<br><br>");
     var inputUsername = addInput(area["フレンドリクエスト"], "ユーザー名", "NAME#XXXX").on("change", function() {
@@ -519,7 +515,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "POST",
-                    url: "https://discord.com/api/v8/users/@me/relationships",
+                    url: "https://discord.com/api/v9/users/@me/relationships",
                     headers: {
                         authorization: v,
                         "content-type": "application/json"
