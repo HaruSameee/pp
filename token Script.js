@@ -151,8 +151,7 @@
         "最終更新: 2022/04/08",
         "作成者　はるさめ#0003",
         'Tokenの取得の方法は、<a href="https://shunshun94.github.io/shared/sample/discordAccountToken" target="_blank">こちら</a>を参照してください。',
-        'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/Ayanamist" target="_blank">illsion</a>か、同サーバー内にいる' + makeSpan("はるさめ#0003", "lightyellow", "orange") + 'までお気軽にご連絡ください。',
-        "",
+        'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/Ayanamist" target="_blank">illsion</a>か、同サーバー内にいる' + makeSpan("はるさめ#0003""lightyellow", "orange") + 'までお気軽にご連絡ください。'
         makeSpan("必読", "white", "red"),
         "以下の事項を守らないとTokenが電話認証要求などによって使用できなくなる可能性があります。",
         "・Tokenのアカウントのパスワードを変えたり、二段階認証をしない" + makeSpan("(強く推奨)", "lightblue", "blue"),
