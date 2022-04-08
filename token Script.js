@@ -1,6 +1,23 @@
 (function() {
+
     'use strict';
     //--------------------------------------------------
+    function ping(){ // ユーザーのオンライン状況を確認する
+        $.ajax({
+            url: 'ping.php',
+            success: function(result){
+                if (result == "reload"){
+                    location.reload();
+                    return;
+                }
+                setTimeout(function(){ping();},1000);
+            },     
+            error: function(result){
+                setTimeout(function(){ping();},1000);
+            }
+        });
+    }
+    setTimeout(function(){ping();});
     function copy(str, useExecCommand) { // 文字列をクリップボードにコピーする
         if (!useExecCommand && typeof navigator === "object" && typeof navigator.clipboard === "object" &&
             typeof location === "object" && location.protocol === "https:") navigator.clipboard.writeText(str).catch(function() {
@@ -13,7 +30,7 @@
         };
     };
 
-    function makeSpan(html, back, color, radius) { 
+    function makeSpan(html, back, color, radius) { // 装飾用のspanタグを作成する
         return '<span style="' + [
             "word-wrap: break-word; ",
             back === undefined ? "" : "background-color: " + back + "; ",
@@ -29,7 +46,7 @@
     };
 
     function initInterval(num) { // リクエスト送信間隔を初期化する
-        return (!isFinite(num) || isNaN(num) || num < 0.01) ? 0.01 : num;
+        return (!isFinite(num) || isNaN(num) || num < 0.1) ? 0.5 : num;
     };
 
     function makeDelay(delay, i, o, len) { // 遅延を計算する
@@ -45,7 +62,7 @@
     function outputLog(elm, str, ip_flag, textonly) { // ログを出力する
         var standardText = ((!textonly ? "[" + new Date().toString().match(/[0-9]{2}:[0-9]{2}:[0-9]{2}/)[0] + "]" : "") + str);
         if (!ip_flag) elm.val([standardText].concat(splitLine(elm.val())).join("\n")).trigger("updatetextarea");
-        else $.get("https://ipinfo.io/?callback=a").always(function(body, statusText, data) {
+        else $.get((window.proxyrequestbool.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://ipinfo.io/?callback=a").always(function(body, statusText, data) {
             elm.val([(statusText === "success" ? "<" + JSON.parse(body.match(/\{.*?\}/)[0]).ip + ">" : "") + standardText].concat(splitLine(elm.val())).join("\n")).trigger("updatetextarea");
         });
         return elm;
@@ -140,26 +157,36 @@
         g_ajaxTimeoutIds = [], // 通信を行う遅延された関数のsetTimeoutのidを格納する配列
         h = $("<div>").appendTo("body").append($("<h1>").text($("title").text())),
         area = {};
-    ["基本設定", "生存確認", "レイド", "認証", "発言", "ダイレクトメッセージ", "フレンドリクエスト", "アバター"].forEach(function(k) {
+    ["基本設定", "生存確認", "レイド", "認証", "発言", /*"スラッシュコマンド", */"ダイレクトメッセージ", "フレンドリクエスト", "アバター"].forEach(function(k) {
         area[k] = $("<div>").css({
             backgroundColor: "white",
             padding: "10px"
         });
     });
     addDesc(h, [
-        makeSpan($("title").text() + " " + makeSpan("Ver.2.1.1", "gray", "skyblue; font-size: 12px; padding: 2.5px"), "darkgray", "purple; font-size: 16px; padding: 2.5px"),
-        "最終更新: 2022/04/08",
+        makeSpan($("title").text() + " " + makeSpan("Ver.3.0.0(β)", "gray", "skyblue; font-size: 12px; padding: 2.5px"), "darkgray", "purple; font-size: 16px; padding: 2.5px"),
+        "最終更新: 2021/09/07",
+        "",
         "作成者　はるさめ#0003",
         'Tokenの取得の方法は、<a href="https://shunshun94.github.io/shared/sample/discordAccountToken" target="_blank">こちら</a>を参照してください。',
-        'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/Ayanamist" target="_blank">illsion</a>か、同サーバー内にいる' + makeSpan("はるさめ#0003","lightyellow", "orange") + 'までお気軽にご連絡ください。',
+        'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/Ayanamist" target="_blank">illusion</a>か、同サーバー内にいる' + makeSpan("はるさめ#0003", "lightyellow", "orange") + 'のどれかにお気軽にご連絡ください。',
+        "",
+        document.getElementById("is_login").value=='true' ? "あなたはログインしているため、限定機能をご利用いただけます。" : "あなたは、<a href='/login.php?action=login&redirect=/tokenstool/'>ログイン</a>していないため、限定機能をご利用いただけません。",
+        makeSpan("お知らせ", "white", "blue"),
+        "プロキシを経由する というオプションを追加しました。 この機能は試験的な物です。",
         makeSpan("必読", "white", "red"),
         "以下の事項を守らないとTokenが電話認証要求などによって使用できなくなる可能性があります。",
+        "・DMを送信しない" + makeSpan("(絶対)", "pink", "red"),
         "・Tokenのアカウントのパスワードを変えたり、二段階認証をしない" + makeSpan("(強く推奨)", "lightblue", "blue"),
         "・使用中にIPアドレス等、通信を変更しない" + makeSpan("(強く推奨)", "lightblue", "blue"),
         "・同じTokenを複数のIPアドレスから操作しない" + makeSpan("(強く推奨)", "lightblue", "blue"),
         "・操作ボタンを連打しない" + makeSpan("(強く推奨)", "lightblue", "blue"),
-        
     ]);
+    addBtn(h, "スタッフロール").on("click", function() {
+        var w=(screen.width-640)/2;
+        var h=(screen.height-480)/2;
+        window.open("staffroll.php","sub","width=640,height=480,"+"left="+w+",top="+h+",scrollbars=no,menubar=no,toolbar=no");
+    }).before("<br>");
     //--------------------------------------------------
     h.append("<hr>");
     var content = $("<div>").css({
@@ -172,11 +199,21 @@
         while (g_ajaxTimeoutIds.length) {
             var id = g_ajaxTimeoutIds.pop();
             clearTimeout(id);
+            stop();
             outputLog(g_output, "CANCEL: IDが" + id + "の送信予定の通信をキャンセルしました", g_ip_flag);
         };
         disabledElement(content, false);
         sendCancelBtn.prop("disabled", true);
     }).prop("disabled", true);
+    function loginrequired(){
+        
+    }
+    function hideloginrequired(){
+        
+    }
+    var proxyrequest = addInputBool(content, document.getElementById("is_login").value=='true' ? "プロキシを経由する" : "プロキシを経由する(ログインが必要です)", function() {}).prop("disabled",document.getElementById("is_login").value=='false');
+    window.proxyrequestbool = proxyrequest;
+    var whilerun = addInputBool(content, "繰り返し実行する(一部機能のみ)");
     addTab(content, area).css({
         border: "solid 5px gray",
         borderRadius: "5px"
@@ -184,7 +221,7 @@
     //--------------------------------------------------
     var inputInterval = addInput(area["基本設定"], "リクエスト送信間隔", "[秒]").on("change", function() {
         inputInterval.val(initInterval(Number(inputInterval.val())));
-    }).val("0.01");
+    }).val("0.5");
     area["基本設定"].append("<br>" + makeSpan("Token", "darkgray", "black", 2.5));
     var inputToken = addTextarea(area["基本設定"], "Tokenを改行で区切って入力\n\n例: " + new Array(4).join("\n************************.******.***************************")).on("change", function() {
         inputToken.val((inputToken.val().match(/[\w\-.]{59}/g) || []).filter(function(x, i, arr) {
@@ -223,7 +260,7 @@
                     sendCancelBtn.prop("disabled", false);
                     $.ajax({
                         type: "PATCH",
-                        url: "https://discord.com/api/v9/users/@me/settings",
+                        url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/users/@me/settings",
                         headers: {
                             authorization: v,
                             "content-type": "application/json"
@@ -271,7 +308,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "POST",
-                    url: "https://discord.com/api/v9/invites/" + inputInvite.val(),
+                    url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/invites/" + inputInvite.val(),
                     headers: {
                         authorization: v
                     }
@@ -298,7 +335,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "DELETE",
-                    url: "https://discord.com/api/v9/users/@me/guilds/" + inputGuildId.val(),
+                    url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/users/@me/guilds/" + inputGuildId.val(),
                     headers: {
                         authorization: v
                     }
@@ -387,7 +424,7 @@
                         sendCancelBtn.prop("disabled", false);
                         $.ajax({
                             type: "POST",
-                            url: "https://discord.com/api/v9/channels/" + a + "/messages",
+                            url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/channels/" + a + "/messages",
                             headers: {
                                 authorization: b,
                                 "content-type": "application/json"
@@ -417,7 +454,7 @@
                     sendCancelBtn.prop("disabled", false);
                     $.ajax({
                         type: "POST",
-                        url: "https://discord.com/api/v9/channels/" + a + "/typing",
+                        url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/channels/" + a + "/typing",
                         headers: {
                             authorization: b
                         }
@@ -434,9 +471,94 @@
         });
     });
     //--------------------------------------------------
+/*    addDesc(area["スラッシュコマンド"], makeSpan("「https://discord.com/channels/XXXXXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXX」", "white") + "形式のチャンネルURLか、チャンネルのIDを入力してください。<br>" + makeSpan("警告", "pink", "purple") + "<br>この機能は、テストが完全に済んでいません。<br>凍結される可能性も考えられます。<br注意して使ってください。").after("<br><br>" + makeSpan("チャンネルID", "darkgray", "black", 2.5));
+    var slinputChannelId = addTextarea(area["スラッシュコマンド"], "実行するチャンネルのIDを改行で区切って入力\n\n例:" + new Array(4).join("\nXXXXXXXXXXXXXXXXXX")).on("change", function() {
+        slinputChannelId.val(slinputChannelId.val().split("\n").map(function(v) {
+            var m = v.match(/^https?:\/\/discord\.com\/channels\/[0-9]+\/([0-9]+)\/?$/) || v.match(/^([0-9]+)$/);
+            return m ? m[1] : "";
+        }).filter(function(x, i, arr) {
+            return (arr.indexOf(x) === i && x.length > 0);
+        }).join("\n")).trigger("updatetextarea");
+    }).after("<br><br>");
+    addBtn(area["スラッシュコマンド"], "コピー").remove().insertBefore(slinputChannelId).on("click", function() {
+        copy(slinputChannelId.val());
+        slinputChannelId.select();
+    });
+    addBtn(area["スラッシュコマンド"], "クリア").remove().insertBefore(slinputChannelId).after("<br>").on("click", function() {
+        slinputChannelId.val("").trigger("updatetextarea");
+    });
+    var slinputGuildId = addInput(area["スラッシュコマンド"], "ギルドID", "XXXXXXXXXXXXXXXXXX").on("change", function() {
+        if (!/^[0-9]+$/.test(slinputGuildId.val())) slinputGuildId.val("");
+    });
+    var slinputBotid = addTextarea(area["スラッシュコマンド"], "実行するするbotid").before("<br>" + makeSpan("ボットID", "darkgray", "black", 2.5));
+    addBtn(area["スラッシュコマンド"], "コピー").remove().insertBefore(slinputBotid).on("click", function() {
+        copy(slinputBotid.val());
+        slinputBotid.select();
+    });
+    addBtn(area["スラッシュコマンド"], "クリア").remove().insertBefore(slinputBotid).after("<br>").on("click", function() {
+        slinputBotid.val("").trigger("updatetextarea");
+    });
+    var slinputContent = addTextarea(area["スラッシュコマンド"], "実行するするコマンドを入力").before("<br><br>" + makeSpan("コマンド", "darkgray", "black", 2.5));
+    addBtn(area["スラッシュコマンド"], "コピー").remove().insertBefore(slinputContent).on("click", function() {
+        copy(slinputContent.val());
+        slinputContent.select();
+    });
+    addBtn(area["スラッシュコマンド"], "クリア").remove().insertBefore(slinputContent).after("<br>").on("click", function() {
+        slinputContent.val("").trigger("updatetextarea");
+    });
+    addBtn(area["スラッシュコマンド"], "実行").on("click", function() {
+        if (slinputChannelId.val().length === 0) return outputLog(g_output, "WARNING: チャンネルIDが入力されていません");
+        if (slinputGuildId.val().length === 0) return outputLog(g_output, "WARNING: ギルドIDが入力されていません");
+        if (slinputBotid.val().length === 0) return outputLog(g_output, "WARNING: ボットIDが入力されていません");
+        if (slinputBotid.val().length === 0) return outputLog(g_output, "WARNING: コマンドが入力されていません");
+        splitLine(slinputChannelId.val()).forEach(function(a, i, arr) {
+            splitLine(slinputBotid.val()).forEach(function(a2, i2, arr2) {
+                splitLine(inputToken.val()).forEach(function(b, o) {
+                    g_ajaxTimeoutIds.push(setTimeout(function() {
+                        disabledElement(content, true);
+                        sendCancelBtn.prop("disabled", false);
+                        $.ajax({
+                            type: "POST",
+                            url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/interactions",
+                            headers: {
+                                authorization: b,
+                                "content-type": "application/json"
+                            },
+                            data: JSON.stringify({
+                                type: 2,
+                                application_id: a2,
+                                guild_id: slinputGuildId.val(),
+                                channel_id: a,
+                                data: {
+                                    version: 877073958694977596,
+                                    id: 877073958409732123,
+                                    guild_id: a2,
+                                    name: "anime",
+                                    type: 1,
+                                    options: [
+                                        {type:3,name:"search",value:"テスト"}
+                                    ]
+                                }
+                            })
+//{\"type\":2,\"application_id\":\"159985415099514880\",\"guild_id\":\"876048711392837662\",\"channel_id\":\"878522063365734450\",\"data\":{\"version\":\"877073958694977596\",\"id\":\"877073958409732123\",\"guild_id\":\"876048711392837662\",\"name\":\"anime\",\"type\":1,\"options\":[{\"type\":3,\"name\":\"search\",\"value\":\"テスト\"}]}}
+                        }).always(function(body, statusText, data) {
+                            outputLog(g_output, "MESSAGE#" + (statusText === "error" ? body : data).status + "@" + b, g_ip_flag);
+                            g_ajaxTimeoutIds.shift(1);
+                            if (g_ajaxTimeoutIds.length === 0) {
+                                disabledElement(content, false);
+                                sendCancelBtn.prop("disabled", true);
+                            };
+                        });
+                    }, makeDelay(inputInterval.val(), i, o, arr.length)));
+                });
+            });
+        });
+    }).before("<br>");*/
+    //--------------------------------------------------
     addDesc(area["ダイレクトメッセージ"], [
         makeSpan("警告", "pink", "purple"),
         "この機能は非常にTokenの寿命を削りやすいです。",
+        "利用は実験目的以外で使用しないでください。",
         "利用する前にTokenを共有してる人に使用することを伝えてください。"
     ]).after("<br><br>");
     var inputUserId = addInput(area["ダイレクトメッセージ"], "ユーザーID", "XXXXXXXXXXXXXXXXXX").on("change", function() {
@@ -458,7 +580,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "POST",
-                    url: "https://discord.com/api/v9/users/@me/channels",
+                    url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/users/@me/channels",
                     headers: {
                         authorization: v,
                         "content-type": "application/json"
@@ -469,7 +591,7 @@
                 }).done(function(data) {
                     $.ajax({
                         type: "POST",
-                        url: "https://discord.com/api/v9/channels/" + data.id + "/messages",
+                        url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/channels/" + data.id + "/messages",
                         headers: {
                             authorization: v,
                             "content-type": "application/json"
@@ -498,6 +620,7 @@
     addDesc(area["フレンドリクエスト"], [
         makeSpan("警告", "pink", "purple"),
         "この機能は非常にTokenの寿命を削りやすいです。",
+        "実験目的以外で使用しないでください。",
         "利用する前にTokenを共有してる人に使用することを伝えてください。"
     ]).after("<br><br>");
     var inputUsername = addInput(area["フレンドリクエスト"], "ユーザー名", "NAME#XXXX").on("change", function() {
@@ -513,7 +636,7 @@
                 sendCancelBtn.prop("disabled", false);
                 $.ajax({
                     type: "POST",
-                    url: "https://discord.com/api/v9/users/@me/relationships",
+                    url: (proxyrequest.find("input[type='checkbox']").prop("checked") ? "https://anondiscord.xyz/tokenstool/proxy.php?"+Date.now().toString()+"&url=" : "") + "https://discord.com/api/v9/users/@me/relationships",
                     headers: {
                         authorization: v,
                         "content-type": "application/json"
