@@ -176,7 +176,6 @@
     addDesc(h, [
         makeSpan($("title").text() + " " + makeSpan("Ver.3.2.0", "gray", "skyblue; font-size: 12px; padding: 2.5px"), "darkgray", "purple; font-size: 16px; padding: 2.5px"),
         "最終更新: 2022/08/29",
-        "",
         "作成者　はるさめ 夕立改二 のなめ",
         'Tokenの取得の方法は、<a href="https://shunshun94.github.io/shared/sample/discordAccountToken" target="_blank">こちら</a>を参照してください。',
         'また、ご不明な点や改善してほしい点がございましたらDiscordサーバーの<a href="https://discord.gg/Ayanamist" target="_blank">旧荒らし連合軍</a>か、同サーバー内にいる' + makeSpan("Auqa#8996　yudachi#6942", "lightyellow", "orange") + 'のどれかにお気軽にご連絡ください。',
